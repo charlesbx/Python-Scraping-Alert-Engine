@@ -1,0 +1,22 @@
+alerts:
+  enabled: false
+storage:
+  csv_path: data/output.csv
+  unique_key: link
+targets:
+- csv_path: data/hn_new.csv
+  fields:
+    link: .titleline a::attr(href)
+    title: .titleline a::text
+  item: .athing
+  name: hn_new
+  url: https://news.ycombinator.com/newest
+- csv_path: data/python_jobs.csv
+  fields:
+    company: .listing-company-name::text
+    link: h2 a::attr(href)
+    posted: time::text
+    title: h2 a::text
+  item: ol.list-recent-jobs li
+  name: python_jobs
+  url: https://www.python.org/jobs/

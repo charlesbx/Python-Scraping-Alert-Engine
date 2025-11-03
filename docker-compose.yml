@@ -1,0 +1,21 @@
+services:
+  autoscrape:
+    build: .
+    image: autoscrape:latest
+    container_name: autoscrape
+    tty: true        # permet le menu interactif dans `docker compose run`
+    stdin_open: true # (optionnel) input dans le terminal
+
+    # monter les fichiers / dossiers locaux dans le conteneur
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./data:/app/data
+      - ./logs:/app/logs
+
+    # fichier d'environnement pour Telegram/Discord
+    env_file:
+      - .env
+
+    # timezone recommandée
+    environment:
+      - TZ=Europe/Paris
