@@ -21,7 +21,7 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(message)s",
     handlers=[
         logging.FileHandler("logs/app.log", encoding="utf-8"),
-        logging.StreamHandler()  # affiche aussi en console
+        logging.StreamHandler()
     ]
 )
 
@@ -37,17 +37,14 @@ def scrape_generic(target):
     for el in soup.select(target["item"]):
         row = {}
         for field, selector in target["fields"].items():
-            # .css::attr(href)
             if "::attr(" in selector:
                 css, rest = selector.split("::attr(", 1)
                 attr = rest.rstrip(")")
                 node = el.select_one(css.strip())
                 val = node.get(attr) if node else None
-                # normalise URLs si c'est un lien
                 if field.lower() in ("link", "url") and val:
                     val = urljoin(url, val)
                 row[field] = val
-            # .css::text
             elif selector.endswith("::text"):
                 css = selector[:-6].strip()
                 node = el.select_one(css)
@@ -55,13 +52,11 @@ def scrape_generic(target):
             else:
                 node = el.select_one(selector)
                 row[field] = node.get_text(strip=True) if node else None
-
-        # n'ajoute la ligne que si elle contient au moins une valeur
+                
         if any(v for v in row.values()):
             row["source"] = target.get("name")
             items.append(row)
 
-    # dé-doublonnage intra-run par tuple trié (ou on peut choisir la clé unique si dispo)
     seen_rows = set()
     deduped = []
     for r in items:
@@ -77,7 +72,6 @@ def load_existing_set(csv_path, unique_key):
         return set()
     with open(csv_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        # si l'entête ne contient pas la clé, on considère qu'il n'y a rien
         if not reader.fieldnames or unique_key not in reader.fieldnames:
             return set()
         return {row[unique_key] for row in reader if row.get(unique_key)}
@@ -86,17 +80,15 @@ def append_csv(csv_path, rows):
     """Écrit uniquement les rows passées (ajout), en gérant dynamiquement les colonnes."""
     if not rows:
         return
-    # colonnes = union de toutes les clés (ordre stable)
     fieldnames = sorted({k for r in rows for k in r.keys()})
     os.makedirs(os.path.dirname(csv_path), exist_ok=True)
     file_exists = os.path.exists(csv_path) and os.stat(csv_path).st_size > 0
 
-    # si le fichier existe déjà et a des colonnes, on les conserve
     if file_exists:
         with open(csv_path, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             if reader.fieldnames:
-                fieldnames = reader.fieldnames  # conserver les colonnes existantes
+                fieldnames = reader.fieldnames
 
     with open(csv_path, "a", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -110,12 +102,10 @@ def send_alerts(new_items, unique_key, source_name):
     if not new_items:
         return
 
-    # Message court et lisible
     lines = [f"🔔 {len(new_items)} nouvel(le)s entrée(s) détectée(s) pour {source_name}:"]
     preview = new_items[:10]
     for it in preview:
         parts = []
-        # on met la clé unique et 1-2 champs utiles si dispos
         if it.get(unique_key):
             parts.append(str(it.get(unique_key)))
         for k in ("title", "company", "price", "posted"):
@@ -192,7 +182,6 @@ if __name__ == "__main__":
             print(f"Alertes {'activées 🔔' if alerts_enabled else 'désactivées 🔕'}")
             continue
         if choice == "1":
-            # scrape all
             for target in config["targets"]:
                 log.info(f"Scraping: {target['name']}")
                 scraped = scrape_generic(target)
@@ -229,7 +218,6 @@ if __name__ == "__main__":
                 log.info(f"Aucune nouvelle entrée pour {target['name']}")
 
         elif choice == "3":
-            # dry-run
             print("Mode dry-run : rien n'est écrit / envoyé.")
             target = config["targets"][0]
             scraped = scrape_generic(target)
