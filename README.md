@@ -69,7 +69,7 @@ TELEGRAM_CHAT_ID=...
 DISCORD_WEBHOOK_URL=...
 ```
 
-Leave them empty to run without alerts.
+Do not leave them empty if alerts is enabled in config.
 
 > Alert toggling in the app currently only affects runtime — config is not edited (Docker mounts it read-only).  
 
