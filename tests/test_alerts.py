@@ -54,8 +54,11 @@ class TestSendAlerts:
         items = [{"link": "url1", "title": "Title 1"}]
         send_alerts(items, "link", "test_source")
 
-        # Should call Telegram API
-        assert any("telegram.org" in str(call) for call in mock_post.call_args_list)
+        # Verify Telegram API was called
+        mock_post.assert_called_once()
+        call_args = mock_post.call_args
+        assert call_args is not None
+        assert "api.telegram.org" in call_args[0][0]  # Check URL in positional args
 
     @patch("autoscrape.alerts.requests.post")
     @patch.dict(os.environ, {"DISCORD_WEBHOOK_URL": "https://discord.com/api/webhooks/test"})
@@ -68,8 +71,12 @@ class TestSendAlerts:
         items = [{"link": "url1", "title": "Title 1"}]
         send_alerts(items, "link", "test_source")
 
-        # Should call Discord webhook
-        assert any("discord.com" in str(call) for call in mock_post.call_args_list)
+        # Verify Discord webhook was called
+        mock_post.assert_called_once()
+        call_args = mock_post.call_args
+        assert call_args is not None
+        # Discord webhook URL is in the positional args
+        assert call_args[0][0].startswith("https://discord.com/")
 
     @patch("autoscrape.alerts.requests.post")
     def test_send_alerts_empty_items(self, mock_post):
