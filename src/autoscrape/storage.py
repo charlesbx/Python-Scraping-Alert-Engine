@@ -51,8 +51,10 @@ def append_csv(csv_path: str, rows: List[Dict[str, Any]]) -> None:
     # Collect all field names from the rows
     fieldnames = sorted({k for r in rows for k in r.keys()})
 
-    # Create directory if it doesn't exist
-    os.makedirs(os.path.dirname(csv_path), exist_ok=True)
+    # Create directory if it doesn't exist (handle files without directory)
+    csv_dir = os.path.dirname(csv_path)
+    if csv_dir:  # Only create directory if path includes one
+        os.makedirs(csv_dir, exist_ok=True)
 
     file_exists = os.path.exists(csv_path) and os.stat(csv_path).st_size > 0
 

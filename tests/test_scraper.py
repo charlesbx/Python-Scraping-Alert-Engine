@@ -7,7 +7,9 @@ from unittest.mock import Mock, patch
 import pytest
 from bs4 import BeautifulSoup
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+# Add src to path for direct test execution (alternative: pip install -e .)
+if os.path.exists(os.path.join(os.path.dirname(__file__), "..", "src")):
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from autoscrape.scraper import _deduplicate_items, _extract_field, fetch_html, scrape_generic
 

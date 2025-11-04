@@ -7,7 +7,9 @@ import tempfile
 
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+# Add src to path for direct test execution (alternative: pip install -e .)
+if os.path.exists(os.path.join(os.path.dirname(__file__), "..", "src")):
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from autoscrape.storage import append_csv, load_existing_set
 
@@ -17,7 +19,10 @@ class TestLoadExistingSet:
 
     def test_load_from_nonexistent_file(self):
         """Test loading from non-existent file returns empty set."""
-        result = load_existing_set("/tmp/nonexistent.csv", "link")
+        import tempfile
+
+        nonexistent_path = os.path.join(tempfile.gettempdir(), "nonexistent_test_file.csv")
+        result = load_existing_set(nonexistent_path, "link")
         assert result == set()
 
     def test_load_from_valid_csv(self):

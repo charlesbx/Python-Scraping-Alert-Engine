@@ -6,7 +6,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+# Add src to path for direct test execution (alternative: pip install -e .)
+if os.path.exists(os.path.join(os.path.dirname(__file__), "..", "src")):
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from autoscrape.alerts import _format_alert_message, send_alerts
 
