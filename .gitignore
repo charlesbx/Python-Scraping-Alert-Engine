@@ -7,13 +7,32 @@ __pycache__/
 env/
 venv/
 *.env
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Testing
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
 
 # Editor & system
 .vscode/
 .idea/
 .DS_Store
+*.swp
+*.swo
+*~
 
 # Project data
 data/
 logs/
+
+# Backup files
+*_backup.py
+*_original_backup.py
+*_legacy.py
 *.cast

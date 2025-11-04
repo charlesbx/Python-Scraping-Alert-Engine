@@ -19,6 +19,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copier code
 COPY monitor.py ./monitor.py
+COPY src/ ./src/
 
 # Créer dossiers (montés en volume ensuite)
 RUN mkdir -p /app/data /app/logs
